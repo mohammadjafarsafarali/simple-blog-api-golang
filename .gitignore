@@ -3,3 +3,6 @@
 
 # Ignore Vendor Path
 vendor
+
+# Ignore IDE file
+.idea
