@@ -6,21 +6,14 @@ import (
 	_ "fmt"
 	"github.com/gorilla/mux"
 	_ "github.com/gorilla/mux"
-	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/joho/godotenv"
 	"io/ioutil"
 	"log"
+	"master_go_programming/db"
+	"master_go_programming/models"
 	"net/http"
 )
-
-var db *gorm.DB
-var err error
-
-type Posts struct {
-	Id      int    `json:"id"`
-	Title   string `json:"title"`
-	Content string    `json:"content"`
-}
 
 func homePage(w http.ResponseWriter, r *http.Request) {
 	fmt.Fprintf(w, "Welcome to HomePage!")
@@ -34,29 +27,21 @@ func handleRequests() {
 	log.Fatal(http.ListenAndServe(":10000", myRouter))
 }
 
-
 func createNewPosts(w http.ResponseWriter, r *http.Request) {
 	reqBody, _ := ioutil.ReadAll(r.Body)
-	var posts Posts
+	var posts models.Post
 	json.Unmarshal(reqBody, &posts)
-	db.Create(&posts)
+	db.Init().Create(&posts)
+
 	fmt.Println("Endpoint Hit: Creating New Booking")
 	json.NewEncoder(w).Encode(posts)
 }
 
-
-
 func main() {
-	// defining username and password and mysql config
-	db, err = gorm.Open("mysql", "root:root@tcp(127.0.0.1:3306)/blog_go?charset=utf8&parseTime=True")
-
+	err := godotenv.Load(".env")
 	if err != nil {
-		log.Println("Connection Failed to Open")
-	} else {
-		log.Println("Connection Established")
+		panic("There is a problem with env file!")
 	}
-
-	db.AutoMigrate(&Posts{})
 
 	handleRequests()
 }
