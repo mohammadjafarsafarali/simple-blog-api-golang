@@ -16,5 +16,6 @@ func CreateNewPosts(w http.ResponseWriter, r *http.Request) {
 	db.Init().Create(&posts)
 
 	fmt.Println("Endpoint Hit: Creating New Booking")
+
 	json.NewEncoder(w).Encode(posts)
 }
